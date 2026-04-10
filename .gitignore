@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+.pytest_cache/
+.coverage
+
+# Editor
+.idea/
+.vscode/
+*.iml
+
+# Secrets — never commit a real token
+k8s/secret.yaml
+

@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: duckdns-updater
+  namespace: default   # adjust to your target namespace
+spec:
+  # Run every 5 minutes — adjust to taste
+  schedule: "*/5 * * * *"
+  # Prevent overlapping runs
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: duckdns-updater
+              # For production, pin to a semver tag instead of latest:
+              #   ghcr.io/franznemeth/duckdns-updater:v1.0.0
+              image: ghcr.io/franznemeth/duckdns-updater:latest
+              imagePullPolicy: Always
+              env:
+                - name: DUCKDNS_SUBDOMAIN
+                  # The subdomain part only — e.g. "my-home" for my-home.duckdns.org
+                  value: "<YOUR_SUBDOMAIN>"
+                - name: DUCKDNS_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: duckdns-secret
+                      key: token
+              resources:
+                requests:
+                  cpu: "50m"
+                  memory: "32Mi"
+                limits:
+                  cpu: "100m"
+                  memory: "64Mi"
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+
