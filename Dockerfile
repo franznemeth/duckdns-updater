@@ -4,7 +4,7 @@ FROM python:3.12-slim AS base
 WORKDIR /app
 
 # Create a non-root user early so we own the workdir
-RUN adduser --disabled-password --gecos "" appuser
+RUN adduser --disabled-password --gecos "" --uid 1000 appuser
 
 # ── dependencies ──────────────────────────────────────────────────────────────
 COPY requirements.txt .
@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY updater.py .
 
 # Drop to non-root
-USER appuser
+USER 1000
 
 ENTRYPOINT ["python", "updater.py"]
 
